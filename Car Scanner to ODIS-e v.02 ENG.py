@@ -27,14 +27,14 @@ def f_comma(my_str, group=2, char=',0x'):
 def add_dataset():
     global diagnostic_address, zdc_name, zdc_version, login
 
-    # Chiedi a quale centralina appartiene il dataset
+    # Ask which ECU the dataset belongs to
     diagnostic_address_input = input("Which control unit does the dataset belong to? (Use only the last two characters i.e. 5F)\n")
     diagnostic_address = "0x" + diagnostic_address_input
 
-    # Chiedi il nome del dataset
+    # Ask for the dataset name
     zdc_name = input("Dataset name?\n")
 
-    # Chiedi la versione del dataset
+    # Ask for the dataset version
     while True:
         zdc_version_input = input("Dataset version? (Enter a number between 1 and 9999)\n")
         if zdc_version_input.isdigit() and 0 < int(zdc_version_input) <= 9999:
@@ -43,7 +43,7 @@ def add_dataset():
         else:
             print("Invalid input. Try again.")
 
-    # Chiedi il codice di sicurezza del dataset
+    # Ask for the security code of the dataset
     login = input("Dataset login code?\n")
 
     while True:
@@ -77,49 +77,50 @@ def missing_datasets():
 def printing_dataset():
     print("I'm generating final dataset...")
 
-    # Crea l'oggetto documento
+    # Create the document object
     doc = dom.Document()
 
-    # Crea l'elemento radice
+    # Create the root element
     root = doc.createElement("MESSAGE")
     doc.appendChild(root)
 
-    # Imposta un attributo per l'elemento radice
+    # Set an attribute for the root element
     root.setAttribute("DTD", "XMLMSG")
     root.setAttribute("VERSION", "1.1")
 
-    # Crea l'elemento result
+    # Create the result element
     result = doc.createElement("RESULT")
     root.appendChild(result)
 
-    # Crea l'elemento response
+    # Create the response element
     response = doc.createElement("RESPONSE")
     result.appendChild(response)
-    # Imposta gli attributi per l'elemento response
+    
+    # Set the attributes for the response element
     response.setAttribute("NAME", "GetParametrizeData")
     response.setAttribute("DTD", "RepairHints")
     response.setAttribute("VERSION", "1.4.7.1")
     response.setAttribute("ID", "0")
 
-    # Crea l'elemento data
+    # Create the date element
     data = doc.createElement("DATA")
     response.appendChild(data)
 
-    # Crea l'elemento request ID
+    # Create the request ID element
     request_ID = doc.createElement("REQUEST_ID")
     data.appendChild(request_ID)
 
-    # Imposta il testo per il sottoelemento
+    # Set the text for the sub-item
     req_id_text = doc.createTextNode("000002023")
     request_ID.appendChild(req_id_text)
 
-    # Crea l'elemento PARAMETER_DATA
+    # Create the PARAMETER_DATA item
     for i in range(len(dataset_lc)):
         if dataset_information[i].strip() == "":
             continue
         parameter_data = doc.createElement("PARAMETER_DATA")
         data.appendChild(parameter_data)
-        # Imposta gli attributi per l'elemento
+        # Set the attributes for the element
         parameter_data.setAttribute("DIAGNOSTIC_ADDRESS", diagnostic_address)
         parameter_data.setAttribute("START_ADDRESS", dataset_lc[i])
         parameter_data.setAttribute("PR_IDX", "")
@@ -130,11 +131,11 @@ def printing_dataset():
         parameter_data.setAttribute("DSD_TYPE", "1")
         parameter_data.setAttribute("SESSIONNAME", "")
         parameter_data.setAttribute("FILENAME", "")
-        # Imposta il testo per l'elemento PARAMETER_DATA
+        # Set the text for the PARAMETER_DATA element
         para_data_text = doc.createTextNode(str(dataset_information[i]))
         parameter_data.appendChild(para_data_text)
 
-    # Crea l'elemento compounds
+    # Create the element compounds
     for i in range(1, 6):
         compounds = doc.createElement("COMPOUNDS")
         data.appendChild(compounds)
@@ -148,13 +149,13 @@ def printing_dataset():
         sw_part_no = doc.createElement("SW_PART_NO")
         compound.appendChild(sw_part_no)
 
-    # Crea l'elemento information
+    # Create the information element
     information = doc.createElement("INFORMATION")
     data.appendChild(information)
     code_ = doc.createElement("CODE")
     information.appendChild(code_)
 
-        # Crea l'elemento DSD_DATA
+    # Create the DSD_DATA item
     dsd_data = doc.createElement("DSD_DATA")
     data.appendChild(dsd_data)
 
@@ -166,7 +167,7 @@ def printing_dataset():
     dsd_data.setAttribute("BYTES_UNCOMPRESSED", "0")
     dsd_data.setAttribute("BYTES_COMPRESSED", "0")
 
-    # Scrivi l'XML su un file
+    # Write the XML to a file
     xmlextension = "xml"
     while True:
         datasetgen = input("Enter a name for XML dataset file:\n")
